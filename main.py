@@ -30,8 +30,12 @@ def initialize_session():
 
 def display_chat_history(messages):
     """チャット履歴を表示する"""
-    # この関数は使用しなくなったが、互換性のために残す
-    pass
+    st.title("経営コンサル「ベッドロッくん」")
+    st.write("架空の焼鳥店「鳥豪族」の経営アドバイスをパワポにまとめます。")
+    
+    for message in messages:
+        with st.chat_message(message['role']):
+            st.markdown(message['text'])
 
 def handle_trace_event(event):
     """トレースイベントの処理を行う"""
@@ -104,8 +108,8 @@ def handle_trace_event(event):
 def invoke_bedrock_agent(client, session_id, prompt):
     """Bedrockエージェントを呼び出す"""
     return client.invoke_agent(
-        agentId="BZLSDYG2NF",
-        agentAliasId="VC2NDHMJMA",
+        agentId=st.secrets["bedrock"]["AGENT_ID"],
+        agentAliasId=st.secrets["bedrock"]["AGENT_ALIAS_ID"],
         sessionId=session_id,
         enableTrace=True,
         inputText=prompt,
@@ -113,14 +117,15 @@ def invoke_bedrock_agent(client, session_id, prompt):
 
 def handle_agent_response(response, messages):
     """エージェントのレスポンスを処理する"""
-    for event in response.get("completion"):
-        if "trace" in event:
-            handle_trace_event(event)
-        
-        if "chunk" in event:
-            answer = event["chunk"]["bytes"].decode()
-            st.write(answer)
-            messages.append({"role": "assistant", "text": answer})
+    with st.chat_message("assistant"):
+        for event in response.get("completion"):
+            if "trace" in event:
+                handle_trace_event(event)
+            
+            if "chunk" in event:
+                answer = event["chunk"]["bytes"].decode()
+                st.write(answer)
+                messages.append({"role": "assistant", "text": answer})
 
 def show_error_popup(exeption):
     """エラーポップアップを表示する"""
@@ -133,38 +138,24 @@ def show_error_popup(exeption):
 def main():
     """メインのアプリケーション処理"""
     client, session_id, messages = initialize_session()
+    display_chat_history(messages)
     
-    # タイトルの上に入力欄を配置
-    st.title("経営コンサル「ベッドロッくん」")
-    
-    # デフォルト文言付きのテキストエリア
-    prompt = st.text_area(
-        "質問を入力", 
-        "架空の焼鳥店「鳥豪族」の2025年5月の売上データを調べて、経営改善アドバイスをパワポにまとめて！", 
-        height=100
-    )
-    
-    # 送信ボタン
-    if st.button("質問する", type="primary"):
-        if prompt:
-            messages.append({"role": "human", "text": prompt})
+    if prompt := st.chat_input("例：売り上げ改善のアドバイスをちょうだい！"):
+        messages.append({"role": "human", "text": prompt})
+        with st.chat_message("user"):
+            st.markdown(prompt)
+        
+        try:
+            response = invoke_bedrock_agent(client, session_id, prompt)
+            handle_agent_response(response, messages)
             
-            try:
-                response = invoke_bedrock_agent(client, session_id, prompt)
-                handle_agent_response(response, messages)
-                
-            except (EventStreamError, ClientError) as e:
-                if "dependencyFailedException" in str(e):
-                    show_error_popup("dependencyFailedException")
-                elif "throttlingException" in str(e):
-                    show_error_popup("throttlingException")
-                else:
-                    raise e
-    
-    # アシスタントのメッセージのみ表示（チャットアイコンなし）
-    for message in messages:
-        if message['role'] == 'assistant':
-            st.markdown(message['text'])
+        except (EventStreamError, ClientError) as e:
+            if "dependencyFailedException" in str(e):
+                show_error_popup("dependencyFailedException")
+            elif "throttlingException" in str(e):
+                show_error_popup("throttlingException")
+            else:
+                raise e
 
 if __name__ == "__main__":
     main()
