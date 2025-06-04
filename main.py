@@ -6,6 +6,12 @@ import streamlit as st
 from botocore.exceptions import ClientError
 from botocore.eventstream import EventStreamError
 
+# ページ設定
+st.set_page_config(
+    page_title="ベッドロッくん",
+    page_icon="🐓"
+)
+
 # 環境変数の設定（secrets.tomlから）
 if "aws" in st.secrets:
     os.environ["AWS_ACCESS_KEY_ID"] = st.secrets["aws"]["AWS_ACCESS_KEY_ID"]
