@@ -105,7 +105,7 @@ def invoke_bedrock_agent(client, session_id, prompt):
     """Bedrockエージェントを呼び出す"""
     return client.invoke_agent(
         agentId="BZLSDYG2NF",
-        agentAliasId="2PZFKQNPJF",
+        agentAliasId="VC2NDHMJMA",
         sessionId=session_id,
         enableTrace=True,
         inputText=prompt,
@@ -140,7 +140,7 @@ def main():
     # デフォルト文言付きのテキストエリア
     prompt = st.text_area(
         "質問を入力", 
-        "鳥豪族の2024年12月の経営レポートを作成してください。売上データや市場分析を含めて、PowerPointプレゼンテーションを生成してください。", 
+        "架空の焼鳥店「鳥豪族」の2025年5月の売上データを調べて、経営改善アドバイスをパワポにまとめて！", 
         height=100
     )
     
