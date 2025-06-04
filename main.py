@@ -140,7 +140,7 @@ def main():
     client, session_id, messages = initialize_session()
     display_chat_history(messages)
     
-    if prompt := st.chat_input("例：売り上げ改善のアドバイスをちょうだい！"):
+    if prompt := st.chat_input("例：2025年5月の売り上げがよくない。アドバイスちょうだい！"):
         messages.append({"role": "human", "text": prompt})
         with st.chat_message("user"):
             st.markdown(prompt)
