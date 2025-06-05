@@ -146,7 +146,24 @@ def main():
     client, session_id, messages = initialize_session()
     display_chat_history(messages)
     
-    if prompt := st.chat_input("例「先月の売上をもとに、経営改善アドバイスをちょうだい！」"):
+    # サンプル質問
+    sample_prompt = None
+    if st.button("サンプル質問"):
+        sample_prompt = "先月の売上をもとに、経営改善アドバイスをちょうだい！"
+    
+    # サンプルボタンがクリックされた場合
+    if sample_prompt:
+        st.session_state.sample_prompt = sample_prompt
+        st.rerun()
+    
+    # セッションステートにサンプルプロンプトがある場合は、それを使用
+    if "sample_prompt" in st.session_state:
+        prompt = st.session_state.sample_prompt
+        del st.session_state.sample_prompt
+    else:
+        prompt = st.chat_input("例「先月の売上をもとに、経営改善アドバイスをちょうだい！」")
+    
+    if prompt:
         messages.append({"role": "human", "text": prompt})
         with st.chat_message("user"):
             st.markdown(prompt)
