@@ -149,7 +149,7 @@ def main():
     # サンプル質問
     sample_prompt = None
     if st.button("サンプル質問"):
-        sample_prompt = "先月の売上をもとに、経営改善アドバイスをちょうだい！"
+        sample_prompt = "先々月の売上をもとに、経営改善アドバイスをちょうだい！"
     
     # サンプルボタンがクリックされた場合
     if sample_prompt:
