@@ -161,7 +161,7 @@ def main():
         prompt = st.session_state.sample_prompt
         del st.session_state.sample_prompt
     else:
-        prompt = st.chat_input("例「先月の売上をもとに、経営改善アドバイスをちょうだい！」")
+        prompt = st.chat_input("例「先々月の売上をもとに、経営改善アドバイスをちょうだい！」")
     
     if prompt:
         messages.append({"role": "human", "text": prompt})
